@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Task Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Task Manager</h2>
+
+  <input type="text" id="taskInput" placeholder="">
+  <button onclick="addTask()">Add</button>
+
+  <div class="board">
+    <div class="column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h3>To Do</h3>
+    </div>
+    <div class="column" id="progress" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h3>In Progress</h3>
+    </div>
+    <div class="column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h3>Done</h3>
+    </div>
+  </div>
+
+  <script>
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const priority = "high";
+
+      if (input.value.trim() === "") return;
+
+      const task = document.createElement("div");
+      task.className = "task " + priority;
+      task.draggable = true;
+      task.ondragstart = drag;
+      task.contentEditable = true;
+      task.innerText = input.value;
+
+      document.getElementById("todo").appendChild(task);
+      input.value = "";
+    }
+
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.outerHTML);
+      event.target.remove();
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+
+      let dropZone = event.target;
+      while (!dropZone.classList.contains("column") && dropZone !== document.body) {
+        dropZone = dropZone.parentNode;
+      }
+
+      if (dropZone.classList.contains("column")) {
+        dropZone.insertAdjacentHTML("beforeend", data);
+        const newTask = dropZone.querySelector(".task:last-child");
+        newTask.ondragstart = drag;
+      }
+    }
+  </script>
+</body>
+</html>
